@@ -1,14 +1,9 @@
-import { server as mswServer } from '../mocks/server';
+import dotenv from 'dotenv';
+import path from 'path';
 
 beforeAll(() => {
-  mswServer.listen({ onUnhandledRequest: 'error' });
-  mswServer.printHandlers();
-});
-
-afterEach(() => {
-  mswServer.resetHandlers();
-});
-
-afterAll(() => {
-  mswServer.close();
+  // Set up dotenv files
+  dotenv.config({
+    path: path.resolve(__dirname, '../../.env.test'),
+  });
 });

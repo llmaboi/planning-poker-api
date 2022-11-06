@@ -10,4 +10,15 @@ export async function registerMySQL(server: FastifyInstance) {
     promise: true,
     rowsAsArray: true,
   });
+
+  // Docker instance
+  // await server.register(fastifyMySQL, {
+  //   host: 'localhost',
+  //   database: 'planning-poker',
+  //   user: 'test_user',
+  //   password: 'test_user_password',
+  //   port: 3306,
+  //   promise: true,
+  //   // rowsAsArray: true,
+  // });
 }
