@@ -1,24 +1,14 @@
-import fastify from 'fastify';
+import { createServer } from './src/config/server';
 import { getEnvConfig } from './src/config/env';
-import fastifyMySQL from '@fastify/mysql/index';
-import roomRoutes from './src/routes/room';
+import { registerMySQL } from './src/config/mysql';
 
-const envConfig = getEnvConfig();
-const server = fastify({ logger: true });
-const port = envConfig.PORT;
-
-async function apiStart() {
-  await server.register(fastifyMySQL, {
-    connectionString: envConfig.DB_URI,
-    promise: true,
-    rowsAsArray: true,
-  });
-
-  await server.register(roomRoutes, { prefix: '/api/' });
-  // app.use(express.json());
+async function start() {
+  const envConfig = getEnvConfig();
 
   try {
-    server.listen({ port }, () => {
+    const server = await createServer();
+    await registerMySQL(server);
+    server.listen({ port: envConfig.PORT }, () => {
       console.log('Server started...');
       server.printRoutes();
     });
@@ -28,4 +18,4 @@ async function apiStart() {
   }
 }
 
-void apiStart();
+void start();

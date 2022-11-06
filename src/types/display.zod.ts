@@ -1,16 +1,22 @@
 import { z } from 'zod';
 
-export const ZodRoomRaw = z.object({
+export const ZodDisplayRaw = z.object({
   id: z.number(),
-  label: z.string().nullable(),
+  room_id: z.number(),
   name: z.string().min(1),
 });
 
-// CREATE TABLE `Rooms` (
+export const ZodDisplay = z.object({
+  id: z.number(),
+  roomId: z.number(),
+  name: z.string().min(1),
+});
+
+// CREATE TABLE `Displays` (
 // 	`id` int NOT NULL AUTO_INCREMENT,
 // 	`name` varchar(255) NOT NULL,
-// 	`label` varchar(255),
 // 	`utc_updated` datetime DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+// 	`room_id` varchar(45) NOT NULL,
 // 	PRIMARY KEY (`id`),
 // 	UNIQUE KEY `id_UNIQUE` (`id`)
 // ) ENGINE InnoDB,

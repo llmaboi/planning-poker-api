@@ -65,7 +65,7 @@ async function createRoom(connection: MySQLPromisePool, roomData: Omit<Room, 'id
     return { data: ZodRoomRaw.parse(row) };
   }
 
-  throw new Error('There was an error updating your room');
+  throw new Error('There was an error creating your room');
 }
 
 export { createRoom, getRoom, getRooms, updateRoom };

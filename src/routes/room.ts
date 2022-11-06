@@ -24,6 +24,8 @@ interface RoomUpdate extends RoomParams {
 // eslint-disable-next-line @typescript-eslint/require-await
 const roomRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/rooms', async (request, reply) => {
+    const urlData = request.urlData();
+    console.log('urlData: ', urlData);
     try {
       return getRooms(fastify.mysql);
     } catch (err) {
@@ -34,6 +36,8 @@ const roomRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.get<RoomParams>('/rooms/:id', async (request, reply) => {
     const { id } = request.params;
+    const urlData = request.urlData();
+    console.log('urlData: ', urlData);
 
     try {
       return getRoom(fastify.mysql, id);
