@@ -1,5 +1,6 @@
 # Ignore Artifacts
 build
+dist
 coverage
 
 # Ignore node
