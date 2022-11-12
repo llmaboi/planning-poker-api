@@ -61,4 +61,42 @@ describe('Route: /rooms', () => {
       return Promise.resolve();
     });
   });
+
+  describe('create or update a room by id', () => {
+    test('returns 200 and room data for creation and updating', async () => {
+      const testRoom: Omit<Room, 'id'> = {
+        name: 'Wazzo World',
+        label: 'This is sweet',
+      };
+
+      const createResponse = await server.inject({
+        method: 'POST',
+        url: '/api/rooms',
+        payload: { label: testRoom.label, name: testRoom.name },
+      });
+      expect(createResponse.statusCode).toEqual(200);
+      const { data: createData } = createResponse.json<{ data: Room }>();
+      const { success: createSuccess } = ZodRoomRaw.safeParse(createData);
+      expect(createSuccess).toBeTruthy();
+      expect(testRoom.name).toEqual(createData.name);
+      expect(testRoom.label).toEqual(createData.label);
+
+      const newRoom: Omit<Room, 'id'> = {
+        name: 'Updated Wazzo World',
+        label: 'Not so sweet',
+      };
+      const updateResponse = await server.inject({
+        method: 'PATCH',
+        url: '/api/rooms/' + createData.id.toString(),
+        payload: { label: newRoom.label, name: newRoom.name },
+      });
+
+      expect(updateResponse.statusCode).toEqual(200);
+      const { data: updateData } = updateResponse.json<{ data: Room }>();
+      const { success } = ZodRoomRaw.safeParse(updateData);
+      expect(success).toBeTruthy();
+      expect(newRoom.name).toEqual(updateData.name);
+      expect(newRoom.label).toEqual(updateData.label);
+    });
+  });
 });

@@ -7,7 +7,7 @@ export const ZodRoomRaw = z.object({
 });
 
 // CREATE TABLE `Rooms` (
-// 	`id` int NOT NULL AUTO_INCREMENT,
+// 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 // 	`name` varchar(255) NOT NULL,
 // 	`label` varchar(255),
 // 	`utc_updated` datetime DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),

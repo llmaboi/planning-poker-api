@@ -13,10 +13,10 @@ export const ZodDisplay = z.object({
 });
 
 // CREATE TABLE `Displays` (
-// 	`id` int NOT NULL AUTO_INCREMENT,
+// 	`id` BIGINT NOT NULL AUTO_INCREMENT,
 // 	`name` varchar(255) NOT NULL,
 // 	`utc_updated` datetime DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-// 	`room_id` int NOT NULL,
+// 	`room_id` BIGINT NOT NULL,
 // 	PRIMARY KEY (`id`),
 // 	UNIQUE KEY `id_UNIQUE` (`id`)
 // ) ENGINE InnoDB,

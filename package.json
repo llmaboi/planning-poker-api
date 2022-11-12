@@ -8,7 +8,7 @@
     "docker:up": "docker compose --env-file ./.env.test  up -d",
     "docker:down": "docker compose down",
     "test": "npm run docker:up && jest && npm run docker:down",
-    "tdd": "npm run docker:up && sleep 5 && jest --watch && npm run docker:down",
+    "tdd": "npm run docker:up && sleep 10 && jest --watch && npm run docker:down",
     "lint": "eslint --max-warnings 0 .",
     "lint:fix": "eslint --fix \"**/*.{js,ts,tsx}\"",
     "prettier": "prettier \"**/*.{js,ts,tsx,md,html,css,scss,json}\" --check --loglevel warn",
