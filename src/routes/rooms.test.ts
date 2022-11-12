@@ -1,36 +1,11 @@
-import { FastifyInstance } from 'fastify/types/instance';
-import { createServer } from '../config/server';
+import { testServer } from '../config/setupTests';
 import { Room } from '../types/room';
 import { ZodRoomRaw } from '../types/room.zod';
-// import { registerMySQL } from '../config/mysql';
-import fastifyMySQL from '@fastify/mysql';
-
-let server: FastifyInstance;
-
-beforeAll(async () => {
-  server = await createServer();
-  // await registerMySQL(server);
-
-  await server.register(fastifyMySQL, {
-    host: 'localhost',
-    database: process.env.MYSQL_DATABASE!,
-    user: process.env.MYSQL_USER!,
-    password: process.env.MYSQL_PASSWORD!,
-    port: parseInt(process.env.MYSQL_PORT!),
-    promise: true,
-  });
-});
-
-afterAll(async () => {
-  if (server) {
-    await server.close();
-  }
-});
 
 describe('Route: /rooms/:id', () => {
   describe('get room by id', () => {
     test('returns 200 and room data', async () => {
-      const response = await server.inject({
+      const response = await testServer.inject({
         method: 'GET',
         url: '/api/rooms/1',
       });
@@ -47,7 +22,7 @@ describe('Route: /rooms/:id', () => {
 describe('Route: /rooms', () => {
   describe('get rooms', () => {
     test('returns 200 and rooms data', async () => {
-      const response = await server.inject({
+      const response = await testServer.inject({
         method: 'GET',
         url: '/api/rooms',
       });
@@ -69,7 +44,7 @@ describe('Route: /rooms', () => {
         label: 'This is sweet',
       };
 
-      const createResponse = await server.inject({
+      const createResponse = await testServer.inject({
         method: 'POST',
         url: '/api/rooms',
         payload: { label: testRoom.label, name: testRoom.name },
@@ -85,7 +60,7 @@ describe('Route: /rooms', () => {
         name: 'Updated Wazzo World',
         label: 'Not so sweet',
       };
-      const updateResponse = await server.inject({
+      const updateResponse = await testServer.inject({
         method: 'PATCH',
         url: '/api/rooms/' + createData.id.toString(),
         payload: { label: newRoom.label, name: newRoom.name },

@@ -3,9 +3,11 @@ version: '1.0'
 services:
 ### MySQL Container
   mysql:
+    env_file:
+      - ./.env.test 
     build:
-      dockerfile: Dockerfile
       context: .
+      dockerfile: Dockerfile
       # dockerfile: dockerfile
       args:
         - MYSQL_DATABASE=${MYSQL_DATABASE}

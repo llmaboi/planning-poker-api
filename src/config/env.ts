@@ -1,27 +1,40 @@
 import dotenv from 'dotenv';
 import { z } from 'zod';
+import path from 'path';
 
 interface Config {
+  DB_HOST: string;
+  DB_NAME: string;
+  DB_USER: string;
+  DB_PASS: string;
+  DB_PORT: number;
   NODE_ENV: string;
-  PORT: number;
-  DB_URI: string;
 }
 
 const ZodEnvConfig = z.object({
-  DATABASE_URL: z.string().url(),
+  DB_HOST: z.string(),
+  MYSQL_DATABASE: z.string(),
+  MYSQL_USER: z.string(),
+  MYSQL_PASSWORD: z.string(),
+  MYSQL_PORT: z.string(),
   NODE_ENV: z.string(),
-  PORT: z.string().nullish(),
 });
 
 let envConfig: Config | undefined;
 
 function getEnvConfig() {
-  if (envConfig?.DB_URI) {
+  if (envConfig?.DB_HOST) {
     return envConfig;
   }
 
   // Set up dotenv files
-  dotenv.config();
+  if (process.env.NODE_ENV === 'test') {
+    dotenv.config({
+      path: path.resolve(__dirname, '../../.env.test'),
+    });
+  } else {
+    dotenv.config();
+  }
 
   const parsedConfig = ZodEnvConfig.safeParse(process.env);
 
@@ -30,9 +43,12 @@ function getEnvConfig() {
   }
 
   envConfig = {
+    DB_HOST: parsedConfig.data.DB_HOST,
+    DB_NAME: parsedConfig.data.MYSQL_DATABASE,
+    DB_USER: parsedConfig.data.MYSQL_USER,
+    DB_PASS: parsedConfig.data.MYSQL_PASSWORD,
+    DB_PORT: parseInt(parsedConfig.data.MYSQL_PORT),
     NODE_ENV: parsedConfig.data.NODE_ENV,
-    DB_URI: parsedConfig.data.DATABASE_URL,
-    PORT: parsedConfig.data.PORT ? parseInt(parsedConfig.data.PORT) : 3030,
   };
 
   return envConfig;

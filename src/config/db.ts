@@ -3,6 +3,7 @@ import { getEnvConfig } from './env';
 
 const config = getEnvConfig();
 
-const db = createConnection(config.DB_URI);
+// TODO: This needs to be fixed...
+const db = createConnection(config.DB_HOST);
 
 export { db };

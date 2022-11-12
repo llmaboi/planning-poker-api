@@ -1,9 +1,20 @@
-import dotenv from 'dotenv';
-import path from 'path';
+import { FastifyInstance } from 'fastify';
+import { getEnvConfig } from './env';
+import { registerMySQL } from './mysql';
+import { createServer } from './server';
 
-beforeAll(() => {
-  // Set up dotenv files
-  dotenv.config({
-    path: path.resolve(__dirname, '../../.env.test'),
-  });
+let testServer: FastifyInstance;
+
+beforeAll(async () => {
+  getEnvConfig();
+  testServer = await createServer();
+  await registerMySQL(testServer);
 });
+
+afterAll(async () => {
+  if (testServer) {
+    await testServer.close();
+  }
+});
+
+export { testServer };

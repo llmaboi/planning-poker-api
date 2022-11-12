@@ -1,11 +1,10 @@
+import urlData from '@fastify/url-data';
 import fastify from 'fastify';
 import { getEnvConfig } from '../config/env';
-import fastifyMySQL from '@fastify/mysql/index';
-import roomRoutes from '../routes/rooms';
-import urlData from '@fastify/url-data';
 import displayRoutes from '../routes/displays';
+import roomRoutes from '../routes/rooms';
 
-const envConfig = getEnvConfig();
+getEnvConfig();
 const server = fastify({ logger: true });
 
 export async function createServer() {
