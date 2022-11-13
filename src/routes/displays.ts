@@ -1,6 +1,7 @@
 import { FastifyPluginAsync, RequestGenericInterface } from 'fastify';
-import { createDisplay, getDisplay, getDisplaysForRoom, updateDisplay } from '../methods/mysqlDisplays';
 import Websocket from 'ws';
+import { createDisplay, getDisplay, getDisplaysForRoom, updateDisplay } from '../methods/mysqlDisplays';
+import { ZodDisplay } from '../types/display.zod';
 
 interface GetDisplayParams extends RequestGenericInterface {
   Params: {
@@ -66,11 +67,13 @@ const displayRoutes: FastifyPluginAsync = async (fastify) => {
     const { roomId, name } = request.body;
 
     try {
-      const displayData = await updateDisplay(fastify.mysql, {
+      const parsedDisplayData = ZodDisplay.parse({
         id: parseInt(id),
         roomId,
         name,
       });
+
+      const displayData = await updateDisplay(fastify.mysql, parsedDisplayData);
 
       void getDisplaysForRoom(fastify.mysql, roomId.toString()).then((displays) => {
         Array.from(roomSockets.values()).forEach((socket) => {
@@ -84,7 +87,8 @@ const displayRoutes: FastifyPluginAsync = async (fastify) => {
 
       return displayData;
     } catch (err) {
-      return reply.send(500); //.json({ error: err });
+      console.error(err);
+      return reply.code(500).send(JSON.stringify(err));
     }
   });
 
@@ -92,9 +96,15 @@ const displayRoutes: FastifyPluginAsync = async (fastify) => {
     const { roomId, name } = request.body;
 
     try {
-      const displayData = createDisplay(fastify.mysql, {
+      const { roomId: parsedRoomId, name: parsedName } = ZodDisplay.parse({
+        id: 1234,
         roomId,
         name,
+      });
+
+      const displayData = createDisplay(fastify.mysql, {
+        roomId: parsedRoomId,
+        name: parsedName,
       });
 
       void getDisplaysForRoom(fastify.mysql, roomId.toString()).then((displays) => {
@@ -109,7 +119,8 @@ const displayRoutes: FastifyPluginAsync = async (fastify) => {
 
       return displayData;
     } catch (err) {
-      return reply.send(500); //.json({ error: err });
+      console.error(err);
+      return reply.code(500).send(JSON.stringify(err));
     }
   });
 };

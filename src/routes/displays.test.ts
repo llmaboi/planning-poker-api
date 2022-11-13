@@ -1,3 +1,5 @@
+// import WebSocket from 'ws';
+// import { getEnvConfig } from '../config/env';
 import { testServer } from '../config/setupTests';
 import { DisplayRaw } from '../types/display';
 import { ZodDisplayRaw } from '../types/display.zod';
@@ -72,5 +74,77 @@ describe('Route: /displays/:id', () => {
       expect(newDisplay.name).toEqual(updateData.name);
       expect(newDisplay.room_id).toEqual(updateData.room_id);
     });
+
+    test('returns 500 when creating with invalid data', async () => {
+      const createResponse = await testServer.inject({
+        method: 'POST',
+        url: '/api/displays',
+        payload: { roomId: '123', name: 'Wazzo' },
+      });
+      expect(createResponse.statusCode).toEqual(500);
+    });
+
+    test('returns 500 when updating with invalid data', async () => {
+      const updateResponse = await testServer.inject({
+        method: 'PATCH',
+        url: '/api/displays/' + '4',
+        payload: { roomId: '1', name: 'nopers' },
+      });
+
+      expect(updateResponse.statusCode).toEqual(500);
+    });
   });
 });
+
+// type WebSocketReadyState =
+//   | typeof WebSocket.CONNECTING
+//   | typeof WebSocket.OPEN
+//   | typeof WebSocket.CLOSING
+//   | typeof WebSocket.CLOSED;
+
+// // TODO: Move me...
+// function waitForSocketState(socket: WebSocket, state: WebSocketReadyState) {
+//   return new Promise<void>((resolve) => {
+//     setTimeout(() => {
+//       if (socket.readyState === state) {
+//         resolve();
+//       } else {
+//         void waitForSocketState(socket, state).then(resolve);
+//       }
+//     }, 10);
+//   });
+// }
+
+// describe.only('gets websocket data on updates', () => {
+//   test('On create websocket sends all displays including created display', async () => {
+//     const envConfig = getEnvConfig();
+//     // const client = new WebSocket(`ws://${envConfig.DB_HOST}:${envConfig.DB_PORT}/api/displays/room/1/socket`);
+//     const client = await testServer.inject(`ws://${envConfig.DB_HOST}:${envConfig.DB_PORT}/api/displays/room/1/socket`);
+//     console.log('client: ', client.raw.res.socket);
+//     await waitForSocketState(client.socket[0], client.OPEN);
+
+//     const testDisplay: Omit<DisplayRaw, 'id'> = {
+//       name: 'Wazzo',
+//       room_id: 12333445566,
+//     };
+
+//     const createResponse = await testServer.inject({
+//       method: 'POST',
+//       url: '/api/displays',
+//       payload: { roomId: testDisplay.room_id, name: testDisplay.name },
+//     });
+
+//     console.log('createResponse: ', createResponse);
+
+//     client.on('message', (data) => {
+//       console.log('data: ', data);
+//       client.close();
+//     });
+
+//     await waitForSocketState(client, client.CLOSED);
+//   });
+
+//   test('On update websocket sends all displays including updated display', async () => {
+//     //
+//   });
+// });

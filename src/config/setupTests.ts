@@ -4,11 +4,13 @@ import { registerMySQL } from './mysql';
 import { createServer } from './server';
 
 let testServer: FastifyInstance;
+const errorSpy = jest.spyOn(console, 'error');
 
 beforeAll(async () => {
   getEnvConfig();
   testServer = await createServer();
   await registerMySQL(testServer);
+  errorSpy.mockImplementation();
 });
 
 afterAll(async () => {
@@ -17,4 +19,8 @@ afterAll(async () => {
   }
 });
 
-export { testServer };
+afterEach(() => {
+  errorSpy.mockReset();
+});
+
+export { testServer, errorSpy };

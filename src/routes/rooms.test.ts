@@ -73,5 +73,24 @@ describe('Route: /rooms', () => {
       expect(newRoom.name).toEqual(updateData.name);
       expect(newRoom.label).toEqual(updateData.label);
     });
+
+    test('returns 500 when creating with invalid data', async () => {
+      const createResponse = await testServer.inject({
+        method: 'POST',
+        url: '/api/rooms',
+        payload: { label: '', name: '' },
+      });
+      expect(createResponse.statusCode).toEqual(500);
+    });
+
+    test('returns 500 when updating with invalid data', async () => {
+      const updateResponse = await testServer.inject({
+        method: 'PATCH',
+        url: '/api/rooms/' + '4',
+        payload: { label: '', name: '' },
+      });
+
+      expect(updateResponse.statusCode).toEqual(500);
+    });
   });
 });

@@ -1,5 +1,6 @@
 import { FastifyPluginAsync, RequestGenericInterface } from 'fastify';
 import { createRoom, getRoom, getRooms, updateRoom } from '../methods/mysqlRooms';
+import { ZodRoomRaw } from '../types/room.zod';
 
 interface RoomParams extends RequestGenericInterface {
   Params: {
@@ -53,13 +54,16 @@ const roomRoutes: FastifyPluginAsync = async (fastify) => {
     const { label, name } = request.body;
 
     try {
-      return updateRoom(fastify.mysql, {
+      const parsedRoomData = ZodRoomRaw.parse({
         id: parseInt(id),
         label,
         name,
       });
+
+      return updateRoom(fastify.mysql, parsedRoomData);
     } catch (err) {
-      return reply.send(500); //.json({ error: err });
+      console.error(err);
+      return reply.code(500).send(JSON.stringify(err));
     }
   });
 
@@ -67,12 +71,16 @@ const roomRoutes: FastifyPluginAsync = async (fastify) => {
     const { label, name } = request.body;
 
     try {
-      return createRoom(fastify.mysql, {
+      const { label: parsedLabel, name: parsedName } = ZodRoomRaw.parse({
+        id: 1234,
         label,
         name,
       });
+
+      return createRoom(fastify.mysql, { label: parsedLabel, name: parsedName });
     } catch (err) {
-      return reply.send(500); //.json({ error: err });
+      console.error(err);
+      return reply.code(500).send(JSON.stringify(err));
     }
   });
 };
