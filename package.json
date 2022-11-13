@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "dev": "rm -rf ./dist && npx tsc && node dist/index.js",
+    "dev": "rm -rf ./dist && mkdir ./dist && cp ./.env* ./dist/ && npm run docker:up && sleep 10 && npx tsc && NODE_ENV=test node dist/index.js",
+    "dev:online": "rm -rf ./dist && npx tsc && node dist/index.js",
     "docker:up": "docker compose --env-file ./.env.test up -d",
     "docker:down": "docker compose down",
     "test": "npm run docker:up && jest && npm run docker:down",
@@ -25,6 +26,7 @@
     "@swc/jest": "^0.2.23",
     "@types/jest": "^29.2.2",
     "@types/node": "^18.11.8",
+    "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "@typescript-eslint/parser": "^5.41.0",
     "eslint": "^8.26.0",
@@ -40,6 +42,7 @@
   },
   "dependencies": {
     "@fastify/mysql": "^4.0.0",
+    "@fastify/websocket": "^7.1.1",
     "dotenv": "^16.0.3",
     "fastify": "^4.9.2",
     "mysql2": "^2.3.3",

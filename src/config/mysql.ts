@@ -10,7 +10,6 @@ export async function registerMySQL(server: FastifyInstance) {
   //   promise: true,
   //   rowsAsArray: true,
   // });
-  console.log('envConfig: ', envConfig);
 
   await server.register(fastifyMySQL, {
     host: envConfig.DB_HOST,

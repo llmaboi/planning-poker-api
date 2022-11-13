@@ -1,5 +1,6 @@
 import { FastifyPluginAsync, RequestGenericInterface } from 'fastify';
 import { createDisplay, getDisplay, getDisplaysForRoom, updateDisplay } from '../methods/mysqlDisplays';
+import Websocket from 'ws';
 
 interface GetDisplayParams extends RequestGenericInterface {
   Params: {
@@ -21,8 +22,25 @@ interface UpdateDisplayParams extends GetDisplayParams {
   };
 }
 
+const roomSockets = new Map<number, Websocket[]>();
+
 // eslint-disable-next-line @typescript-eslint/require-await
 const displayRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.get<GetDisplayParams>('/displays/room/:id/socket', { websocket: true }, (connection, request) => {
+    const { id } = request.params;
+
+    // Registration only happens on opening of the connection.
+    if (connection.socket.OPEN) {
+      const existing = roomSockets.get(parseInt(id));
+
+      if (existing) {
+        roomSockets.set(parseInt(id), [...existing, connection.socket]);
+      } else {
+        roomSockets.set(parseInt(id), [connection.socket]);
+      }
+    }
+  });
+
   fastify.get<GetDisplayParams>('/displays/room/:id', async (request, reply) => {
     const { id } = request.params;
 
@@ -48,11 +66,23 @@ const displayRoutes: FastifyPluginAsync = async (fastify) => {
     const { roomId, name } = request.body;
 
     try {
-      return updateDisplay(fastify.mysql, {
+      const displayData = await updateDisplay(fastify.mysql, {
         id: parseInt(id),
         roomId,
         name,
       });
+
+      void getDisplaysForRoom(fastify.mysql, roomId.toString()).then((displays) => {
+        Array.from(roomSockets.values()).forEach((socket) => {
+          socket.forEach((webSocket) => {
+            if (webSocket.OPEN) {
+              webSocket.send(JSON.stringify(displays));
+            }
+          });
+        });
+      });
+
+      return displayData;
     } catch (err) {
       return reply.send(500); //.json({ error: err });
     }
@@ -62,10 +92,22 @@ const displayRoutes: FastifyPluginAsync = async (fastify) => {
     const { roomId, name } = request.body;
 
     try {
-      return createDisplay(fastify.mysql, {
+      const displayData = createDisplay(fastify.mysql, {
         roomId,
         name,
       });
+
+      void getDisplaysForRoom(fastify.mysql, roomId.toString()).then((displays) => {
+        Array.from(roomSockets.values()).forEach((socket) => {
+          socket.forEach((myWs) => {
+            if (myWs.OPEN) {
+              myWs.send(JSON.stringify(displays));
+            }
+          });
+        });
+      });
+
+      return displayData;
     } catch (err) {
       return reply.send(500); //.json({ error: err });
     }

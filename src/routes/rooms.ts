@@ -23,18 +23,6 @@ interface RoomUpdate extends RoomParams {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 const roomRoutes: FastifyPluginAsync = async (fastify) => {
-  fastify.get('/rooms', async (request, reply) => {
-    // TODO: Remove this?
-    const urlData = request.urlData();
-    console.log('urlData: ', urlData);
-    try {
-      return getRooms(fastify.mysql);
-    } catch (err) {
-      console.error(err);
-      return reply.send(500); //.json({ error: err });
-    }
-  });
-
   fastify.get<RoomParams>('/rooms/:id', async (request, reply) => {
     const { id } = request.params;
     // TODO: Remove this?
@@ -43,6 +31,18 @@ const roomRoutes: FastifyPluginAsync = async (fastify) => {
 
     try {
       return getRoom(fastify.mysql, id);
+    } catch (err) {
+      return reply.send(500); //.json({ error: err });
+    }
+  });
+
+  fastify.get('/rooms', async (request, reply) => {
+    // TODO: Remove this?
+    const urlData = request.urlData();
+    console.log('urlData: ', urlData);
+
+    try {
+      return getRooms(fastify.mysql);
     } catch (err) {
       return reply.send(500); //.json({ error: err });
     }

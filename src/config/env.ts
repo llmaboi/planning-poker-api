@@ -8,11 +8,13 @@ interface Config {
   DB_USER: string;
   DB_PASS: string;
   DB_PORT: number;
+  SERVER_PORT: number;
   NODE_ENV: string;
 }
 
 const ZodEnvConfig = z.object({
   DB_HOST: z.string(),
+  DB_PORT: z.string(),
   MYSQL_DATABASE: z.string(),
   MYSQL_USER: z.string(),
   MYSQL_PASSWORD: z.string(),
@@ -48,6 +50,7 @@ function getEnvConfig() {
     DB_USER: parsedConfig.data.MYSQL_USER,
     DB_PASS: parsedConfig.data.MYSQL_PASSWORD,
     DB_PORT: parseInt(parsedConfig.data.MYSQL_PORT),
+    SERVER_PORT: parseInt(parsedConfig.data.DB_PORT),
     NODE_ENV: parsedConfig.data.NODE_ENV,
   };
 
