@@ -31,10 +31,13 @@ function getEnvConfig() {
 
   // Set up dotenv files
   if (process.env.NODE_ENV === 'test') {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     dotenv.config({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
       path: path.resolve(__dirname, '../../.env.test'),
     });
   } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     dotenv.config();
   }
 

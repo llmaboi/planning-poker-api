@@ -12,6 +12,8 @@ CREATE TABLE `Displays` (
 	`name` varchar(255) NOT NULL,
 	`utc_updated` datetime DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
 	`room_id` BIGINT NOT NULL,
+	`card_value` INT NOT NULL,
+	`is_host` BOOLEAN DEFAULT 0,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE InnoDB,
@@ -32,11 +34,13 @@ CREATE TABLE `Rooms` (
 
 -- UNLOCK TABLES;
 
-INSERT INTO `Displays` (`name`, `room_id`)
-VALUES ('Test Display', '1'),
-  ('Test Display 2', '1'),
-  ('Test Display 3', '1');
+INSERT INTO `Displays` (`name`, `room_id`, `card_value`)
+VALUES 
+	('Test Display', '1', '3'),
+  ('Test Display 2', '1', '3'),
+  ('Test Display 3', '1', '3');
 
 INSERT INTO `Rooms` (`name`, `label`)
-VALUES ('Test Room', 'Test Label'),
+VALUES
+	('Test Room', 'Test Label'),
   ('No label room', NULL);

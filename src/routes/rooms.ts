@@ -1,10 +1,16 @@
 import { FastifyPluginAsync, RequestGenericInterface } from 'fastify';
-import { createRoom, getRoom, getRooms, updateRoom } from '../methods/mysqlRooms';
-import { ZodRoomRaw } from '../types/room.zod';
+import { createRoom, getRoomById, getRoomByName, getRooms, updateRoom } from '../methods/mysqlRooms';
+import { ZodRoomRaw } from '../../../types';
 
-interface RoomParams extends RequestGenericInterface {
+interface RoomByIdParams extends RequestGenericInterface {
   Params: {
     id: string;
+  };
+}
+
+interface RoomByNameParams extends RequestGenericInterface {
+  Querystring: {
+    name: string;
   };
 }
 
@@ -15,7 +21,7 @@ interface RoomCreate extends RequestGenericInterface {
   };
 }
 
-interface RoomUpdate extends RoomParams {
+interface RoomUpdate extends RoomByIdParams {
   Body: {
     label: string | null;
     name: string;
@@ -24,14 +30,27 @@ interface RoomUpdate extends RoomParams {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 const roomRoutes: FastifyPluginAsync = async (fastify) => {
-  fastify.get<RoomParams>('/rooms/:id', async (request, reply) => {
+  fastify.get<RoomByIdParams>('/rooms/id/:id', async (request, reply) => {
     const { id } = request.params;
     // TODO: Remove this?
     const urlData = request.urlData();
     console.log('urlData: ', urlData);
 
     try {
-      return getRoom(fastify.mysql, id);
+      return getRoomById(fastify.mysql, id);
+    } catch (err) {
+      return reply.send(500); //.json({ error: err });
+    }
+  });
+
+  fastify.get<RoomByNameParams>('/rooms/name', async (request, reply) => {
+    const { name } = request.query;
+    // TODO: Remove this?
+    const urlData = request.urlData();
+    console.log('urlData: ', urlData);
+
+    try {
+      return getRoomByName(fastify.mysql, name);
     } catch (err) {
       return reply.send(500); //.json({ error: err });
     }

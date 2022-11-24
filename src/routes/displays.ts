@@ -1,7 +1,7 @@
 import { FastifyPluginAsync, RequestGenericInterface } from 'fastify';
 import Websocket from 'ws';
 import { createDisplay, getDisplay, getDisplaysForRoom, updateDisplay } from '../methods/mysqlDisplays';
-import { ZodDisplay } from '../types/display.zod';
+import { ZodDisplay } from '../../../types';
 
 interface GetDisplayParams extends RequestGenericInterface {
   Params: {
@@ -13,6 +13,8 @@ interface CreateDisplayParams extends RequestGenericInterface {
   Body: {
     roomId: number;
     name: string;
+    cardValue: number;
+    isHost: boolean;
   };
 }
 
@@ -20,6 +22,8 @@ interface UpdateDisplayParams extends GetDisplayParams {
   Body: {
     roomId: number;
     name: string;
+    cardValue: number;
+    isHost: boolean;
   };
 }
 
@@ -29,6 +33,8 @@ const roomSockets = new Map<number, Websocket[]>();
 const displayRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get<GetDisplayParams>('/displays/room/:id/socket', { websocket: true }, (connection, request) => {
     const { id } = request.params;
+
+    console.log('id: ', id);
 
     // Registration only happens on opening of the connection.
     if (connection.socket.OPEN) {
@@ -64,13 +70,15 @@ const displayRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.patch<UpdateDisplayParams>('/displays/:id', async (request, reply) => {
     const { id } = request.params;
-    const { roomId, name } = request.body;
+    const { roomId, name, cardValue, isHost } = request.body;
 
     try {
       const parsedDisplayData = ZodDisplay.parse({
         id: parseInt(id),
         roomId,
         name,
+        cardValue,
+        isHost,
       });
 
       const displayData = await updateDisplay(fastify.mysql, parsedDisplayData);
@@ -93,18 +101,27 @@ const displayRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   fastify.post<CreateDisplayParams>('/displays', async (request, reply) => {
-    const { roomId, name } = request.body;
+    const { roomId, name, cardValue, isHost } = request.body;
 
     try {
-      const { roomId: parsedRoomId, name: parsedName } = ZodDisplay.parse({
+      const {
+        roomId: parsedRoomId,
+        name: parsedName,
+        cardValue: parsedCardValue,
+        isHost: parsedIsHost,
+      } = ZodDisplay.parse({
         id: 1234,
         roomId,
         name,
+        cardValue,
+        isHost,
       });
 
       const displayData = createDisplay(fastify.mysql, {
         roomId: parsedRoomId,
         name: parsedName,
+        cardValue: parsedCardValue,
+        isHost: parsedIsHost,
       });
 
       void getDisplaysForRoom(fastify.mysql, roomId.toString()).then((displays) => {

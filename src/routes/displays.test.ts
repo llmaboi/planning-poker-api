@@ -1,7 +1,7 @@
 // import WebSocket from 'ws';
 // import { getEnvConfig } from '../config/env';
 import { testServer } from '../config/setupTests';
-import { DisplayRaw } from '../types/display';
+import { DisplayRaw } from '../../../types/display';
 import { ZodDisplayRaw } from '../types/display.zod';
 
 describe('Route: /displays/room/:id', () => {
@@ -43,6 +43,8 @@ describe('Route: /displays/:id', () => {
       const testDisplay: Omit<DisplayRaw, 'id'> = {
         name: 'Wazzo',
         room_id: 12333445566,
+        card_value: 3,
+        is_host: 0,
       };
 
       const createResponse = await testServer.inject({
@@ -60,6 +62,8 @@ describe('Route: /displays/:id', () => {
       const newDisplay: Omit<DisplayRaw, 'id'> = {
         name: 'Updated Wazzo',
         room_id: 11111999999,
+        card_value: 3,
+        is_host: 0,
       };
       const updateResponse = await testServer.inject({
         method: 'PATCH',

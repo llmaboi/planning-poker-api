@@ -1,8 +1,6 @@
 import { MySQLPromisePool } from '@fastify/mysql';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { Display, DisplayRaw } from '../types/display';
-import { ZodDisplayRaw } from '../types/display.zod';
-import { PromiseData } from '../types/response';
+import { ZodDisplayRaw, PromiseData, Display, DisplayRaw } from '../../../types';
 
 async function createDisplay(connection: MySQLPromisePool, displayData: Omit<Display, 'id'>): PromiseData<DisplayRaw> {
   let queryString = 'INSERT INTO Displays (name';
@@ -57,7 +55,9 @@ async function getDisplaysForRoom(connection: MySQLPromisePool, id: string): Pro
 async function updateDisplay(connection: MySQLPromisePool, displayData: Display): PromiseData<DisplayRaw> {
   let queryString = 'UPDATE Displays ';
   queryString += `SET name = "${displayData.name}", `;
-  queryString += 'room_id = ' + displayData.roomId.toString() + ' ';
+  queryString += 'room_id = ' + displayData.roomId.toString() + ', ';
+  queryString += 'card_value = ' + displayData.cardValue.toString() + ', ';
+  queryString += 'is_host = ' + (displayData.isHost ? 1 : 0).toString() + ' ';
   queryString += 'WHERE id = ' + displayData.id.toString();
 
   const [result] = await connection.query<ResultSetHeader>(queryString);
